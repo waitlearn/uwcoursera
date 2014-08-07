@@ -39,12 +39,12 @@ mystery3:
 */
 int get_block_size(void) {
   /* YOUR CODE GOES HERE */
-  addr_t start = 0xf00000000;             // the last few digits better be 0 so the block can start from the beginning.
+  addr_t start = 0x80400000;             // the last few digits better be 0 so the block can start from the beginning.
   access_cache(start);
   addr_t i;
   for (i = 0; ; i++)
     {
-     if (access_cache(start + i) == FALSE)
+     if (access_cache(start + i) == FALSE) 
        break;
     }
   return i;
@@ -55,20 +55,16 @@ int get_block_size(void) {
 */
 int get_cache_size(int size) {
   /* YOUR CODE GOES HERE */
-  addr_t start =0xf00000000;
+  addr_t start =0x80400000;
   addr_t i;
-  addr_t finalsize = 1;
+  flush_cache();
   access_cache(start);
-  do{
-    flush_cache();
-    for (i = 0;i <= finalsize ; i ++)
-      access_cache(start + i * size);
-    if (access_cache(start) == TRUE)
-      finalsize ++;
-    else
+  for(i = 0; i < 10000000000 ;i += size){
+    access_cache(start + i);
+    if (access_cache(start) == FALSE)
       break;
-  }while(TRUE);
-  return finalsize * size;
+  }
+  return i * size;
 }
 
 /*
@@ -76,37 +72,8 @@ int get_cache_size(int size) {
 */
 int get_cache_assoc(int size) {
   /* YOUR CODE GOES HERE */
-  int cache_size = get_cache_size(size);
-  int block_size = get_block_size();
-  int blocks = cache_size/block_size;
-  int assoc = 1;
-  int array = blocks/assoc;
-  int i;
-  addr_t step;
-  addr_t start = 0xf00000000;
 
-  do
-  {
-    flush_cache();
-    step = cache_size*array;
-    for(i=0;i<assoc;i++)
-    {
-        access_cache(start+i*step);
-    }
-    access_cache(start+assoc*step);
-    if(access_cache(start))
-    {
-        assoc*=2;
-        array = blocks/assoc;
-    }
-    else
-    {
-        break;
-    }
-  }while(TRUE);
-
-  return assoc;
-
+  return -1;
 }
 
 //// DO NOT CHANGE ANYTHING BELOW THIS POINT
